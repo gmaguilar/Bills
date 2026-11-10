@@ -1,0 +1,26 @@
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:latest
+    container_name: bills-db-oracle
+    restart: unless-stopped
+
+    ports:
+      - "1521:1521"
+
+    environment:
+      ORACLE_PASSWORD: Oracle12345
+
+    volumes:
+      - "/Users/guadalupemarquezaguilar/Documents/Universidad/ASEE/ControlBills/Bills/Oracle:/opt/oracle/oradata"
+
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 5m
+
+volumes:
+  oracle_data:
+    name: oracle_data

@@ -4,7 +4,99 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34107ec1-c51e-4396-81c9-24dfe229fd46" name="Changes" comment="" />
+    <list default="true" id="34107ec1-c51e-4396-81c9-24dfe229fd46" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/maven.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.openapi-generator-ignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.openapi-generator/FILES" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.openapi-generator/VERSION" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/openapi.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.sbt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/Bill.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/BillApi.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/BillPartakerValue.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/BillRequest.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/Budget.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/BudgetApi.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ChangeStatusRequest.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/Error.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ExportApi.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/PartakerBudget.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/PaymentMethod.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ShareApi.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ShareBillRequest.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ShareBillRequestPartaker.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/StatusApi.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/StatusBill.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/git_push.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/AndroidManifest.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ApiCallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ApiClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ApiException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ApiResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/Configuration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/GzipRequestInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/JSON.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/Pair.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ProgressRequestBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ProgressResponseBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ServerConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/ServerVariable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/StringUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/api/BillApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/api/BudgetApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/api/ExportApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/api/ShareApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/api/StatusApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/auth/ApiKeyAuth.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/auth/Authentication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/auth/HttpBasicAuth.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/auth/HttpBearerAuth.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/AbstractOpenApiSchema.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/Bill.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/BillPartakerValue.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/BillRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/Budget.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/ChangeStatusRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/Error.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/PartakerBudget.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/PaymentMethod.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/ShareBillRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/ShareBillRequestPartaker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/openapitools/client/model/StatusBill.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/api/BillApiTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/api/BudgetApiTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/api/ExportApiTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/api/ShareApiTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/api/StatusApiTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/BillPartakerValueTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/BillRequestTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/BillTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/BudgetTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/ChangeStatusRequestTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/ErrorTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/PartakerBudgetTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/PaymentMethodTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/ShareBillRequestPartakerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/ShareBillRequestTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/openapitools/client/model/StatusBillTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -76,7 +168,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Merging main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/guadalupemarquezaguilar/Documents/Universidad/ASEE/ControlBills/Bills",
     "node.js.detected.package.eslint": "true",

@@ -20,3 +20,6 @@ target
 .gradle
 build
 .env
+
+/ORACLE/dbconfig
+/ORACLE/FREE

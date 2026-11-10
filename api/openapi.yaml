@@ -1,0 +1,1352 @@
+openapi: 3.0.3
+info:
+  description: "API for managing bills, including creating, updating, deleting, sharing,\
+    \ and exporting bills. The API allows users to filter bills based on various criteria\
+    \ such as user ID, category ID, status, payment method, date range, quantity range,\
+    \ text search, and active status. It also provides endpoints for changing the\
+    \ status of a bill and retrieving the available budget for a user. The systems\
+    \ saves ids but when the user interacts with the API, they work with the actual\
+    \ data rather than the IDs."
+  title: Bill API
+  version: 1.0.0
+servers:
+- description: Local development server for API testing and development.
+  url: http://localhost:8081
+- description: "Production server until a custom domain is available; currently, localhost\
+    \ until Practice 3"
+  url: https://localhost:8082
+tags:
+- description: Operations related to bills.
+  name: bill
+- description: Operations related to bill states
+  name: status
+- description: Operations related to sharing bills with other users
+  name: share
+- description: Operations related to checking available balance for users
+  name: budget
+- description: Operations related to exporting bills
+  name: export
+paths:
+  /bill:
+    get:
+      description: "Retrieve a list of bills, optionally filtered by userId, categoryId,\
+        \ status, paymentMethod, dates, quantity, and active status. If the user does\
+        \ not provide any filters, all its bills will be returned. The response will\
+        \ include the details of each bill, including its unique ID, user ID, quantity,\
+        \ description, category ID, status, payment method, shared status, creation\
+        \ and modification timestamps, and active status. The user can combine multiple\
+        \ filters to narrow down the results. If no bills match the provided filters,\
+        \ an empty array will be returned. The user must be authenticated to access\
+        \ this endpoint, and the provided bearer token must be valid. The date filters\
+        \ (initialDate and finalDate) should be provided in the format DD-MM-YYYY\
+        \ HH:MM:SS. If only one date is provided, this date will be used as both the\
+        \ start and end date for filtering. The quantity filter should be provided\
+        \ as numeric values. The isActive filter allows the user to retrieve only\
+        \ active bills (true) or only inactive bills (false). If not provided, the\
+        \ default behavior is to return only active bills. The user can also filter\
+        \ bills by categoryId, which will return the corresponding code for the category\
+        \ in the response. If no categoryId is provided, this filter will be ignored.\
+        \ It is necessary comunication with the Category microservice to validate\
+        \ the categoryId provided in the bill request. The categoryId should correspond\
+        \ to existing categories in the system. If invalid IDs are provided, a 400\
+        \ Bad Request error will be returned. The status and payment method filters\
+        \ should be one of the allowed values defined in the StatusBill and paymentMethod\
+        \ schemas, respectively. If invalid values are provided, a 400 Bad Request\
+        \ error will be returned. The list of bills must be for the authenticated\
+        \ user. If the user ID provided in the query does not match the authenticated\
+        \ user's ID, a 403 Forbidden error will be returned."
+      operationId: listBill
+      parameters:
+      - description: ID of the user to filter bills by. It will only return bills
+          belonging to this user.
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: form
+      - description: ID of the category to filter bills by. The user will receive
+          the code corresponding to the category in the response.
+        example: 123e4567-e89b-12d3-a456-426614174000
+        explode: true
+        in: query
+        name: categoryId
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: Status of the bill to filter by.
+        example: PENDIENTE
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          $ref: "#/components/schemas/StatusBill"
+        style: form
+      - description: Payment method of the bill to filter by.
+        example: EFECTIVO
+        explode: true
+        in: query
+        name: paymentMethod
+        required: false
+        schema:
+          $ref: "#/components/schemas/paymentMethod"
+        style: form
+      - description: "Initial date to filter bills from (inclusive). The format should\
+          \ be DD-MM-YYYY HH:MM:SS. If not provided, the filter will start from the\
+          \ earliest bill date."
+        explode: true
+        in: query
+        name: initialDate
+        required: false
+        schema:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        style: form
+      - description: "Final date to filter bills until (inclusive). The format should\
+          \ be DD-MM-YYYY HH:MM:SS. If not provided, the filter will include all bills\
+          \ up to the current date."
+        explode: true
+        in: query
+        name: finalDate
+        required: false
+        schema:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        style: form
+      - description: Minimum quantity to filter bills by.
+        explode: true
+        in: query
+        name: quantityMin
+        required: false
+        schema:
+          example: 1.5
+          format: double
+          type: number
+        style: form
+      - description: Maximum quantity to filter bills by.
+        explode: true
+        in: query
+        name: quantityMax
+        required: false
+        schema:
+          example: 100.0
+          format: double
+          type: number
+        style: form
+      - description: Text to filter bills by.
+        explode: true
+        in: query
+        name: text
+        required: false
+        schema:
+          example: Dinner with friends
+          type: string
+        style: form
+      - description: ID of the partaker to filter bills by. The user will receive
+          the code corresponding to the partaker in the response.
+        explode: true
+        in: query
+        name: partakerId
+        required: false
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: form
+      - description: Filter bills by their active status.
+        explode: true
+        in: query
+        name: isActive
+        required: false
+        schema:
+          default: true
+          example: true
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+              - id: 123e4567-e89b-12d3-a456-426614174000
+                userId: 123e4567-e89b-12d3-a456-426614174000
+                quantity: 1.5
+                description: Compra semanal
+                categoryId: 123e4567-e89b-12d3-a456-426614174000
+                status: PENDIENTE
+                paymentMethod: EFECTIVO
+                shared: false
+                createdAt: 2026-10-24T00:00:00Z
+                updatedAt: 2026-10-24T00:00:00Z
+              schema:
+                items:
+                  $ref: "#/components/schemas/Bill"
+                type: array
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              example:
+                message: Invalid search query. Please check the provided filters.
+                code: 400
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthorized.
+                code: 401
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+                code: 403
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Internal server error.
+                code: 500
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              example:
+                message: Service unavailable.
+                code: 503
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: List and filter bills based on various criteria.
+      tags:
+      - bill
+      x-accepts:
+      - application/json
+    post:
+      description: "Create a new bill with the provided details. The request body\
+        \ must contain the necessary information to create the bill. The categoryId\
+        \ must correspond to an existing category, and the paymentMethod must be one\
+        \ of the allowed values. The userId must be a valid user in the system. The\
+        \ bill will be created with a default status of \"PENDIENTE\" and will be\
+        \ marked as active. If the bill is shared, the shared field will be set to\
+        \ true and the partaker field will contain the userId with whom the bill is\
+        \ shared. The response will include the details of the created bill, including\
+        \ its unique ID and timestamps for creation and modification. The user must\
+        \ be authenticated to access this endpoint, and the provided bearer token\
+        \ must be valid. Only authenticated users can create bills. The partaker field\
+        \ will only be populated if the bill is shared. It is requiered communication\
+        \ with the Category microservice to validate the categoryId provided in the\
+        \ bill request. When a new bill is created, the system will communicate with\
+        \ the User microservice to update the user's qtyWasted accordingly. To obtain\
+        \ the category the system will comunicate with the endpoint GET -> /category"
+      operationId: createBill
+      requestBody:
+        content:
+          application/json:
+            example:
+              userId: 123e4567-e89b-12d3-a456-426614174000
+              quantity: 1.5
+              description: Compra semanal
+              categoryId: 123e4567-e89b-12d3-a456-426614174000
+              paymentMethod: EFECTIVO
+            schema:
+              $ref: "#/components/schemas/BillRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                id: 123e4567-e89b-12d3-a456-426614174000
+                userId: 123e4567-e89b-12d3-a456-426614174000
+                quantity: 1.5
+                description: Compra semanal
+                categoryId: 123e4567-e89b-12d3-a456-426614174000
+                status: PENDIENTE
+                paymentMethod: EFECTIVO
+                shared: false
+                createdAt: 2026-10-24T00:00:00Z
+                updatedAt: 2026-10-24T00:00:00Z
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation. Bill created
+        "400":
+          content:
+            application/json:
+              example:
+                message: Invalid bill data. Please check the provided information.
+                code: 400
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unable to create bill. The provided bill data is invalid or
+            incomplete.
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthorized.
+                code: 401
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+                code: 403
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user is authenticated but does not have permission
+            to access the requested resource.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Internal server error.
+                code: 500
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              example:
+                message: Service unavailable.
+                code: 503
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Create a bill.
+      tags:
+      - bill
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /bill/{billId}:
+    delete:
+      description: "Perform a logical delete on a bill. The billId is provided in\
+        \ the path, and the user must be authenticated to access this endpoint. The\
+        \ provided bearer token must be valid. If the token is missing or invalid,\
+        \ a 401 Unauthorized error will be returned. The billId provided in the path\
+        \ must correspond to an existing bill in the system. If the billId is invalid\
+        \ or does not exist, a 404 Not Found error will be returned. The billId provided\
+        \ in the path must be for the authenticated user. If the billId belongs to\
+        \ a different user, a 403 Forbidden error will be returned. The response will\
+        \ include the details of the deleted bill, including its unique ID, user ID,\
+        \ quantity, description, category ID, status, payment method, shared status,\
+        \ creation and modification timestamps, and active status."
+      operationId: deleteBill
+      parameters:
+      - explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Delete a bill
+      tags:
+      - bill
+      x-accepts:
+      - application/json
+    get:
+      description: "Retrieve the details of a specific bill using its unique ID. The\
+        \ billId is provided in the path parameter. The response will include the\
+        \ details of the bill, including its unique ID, userId, quantity, description,\
+        \ categoryId, status, payment method, shared status, creation and modification\
+        \ timestamps, and active status. The user must be authenticated to access\
+        \ this endpoint, and the provided bearer token must be valid. If the token\
+        \ is missing or invalid, a 401 Unauthorized error will be returned. The billId\
+        \ provided in the path must correspond to an existing bill in the system.\
+        \ If the billId is invalid or does not exist, a 404 Not Found error will be\
+        \ returned. The billId provided in the path must be for the authenticated\
+        \ user. If the billId belongs to a different user, a 403 Forbidden error will\
+        \ be returned. The response will be in JSON format, and the bill details will\
+        \ be structured according to the Bill schema defined in the components section\
+        \ of the API documentation. The user can use this endpoint to view the details\
+        \ of a specific bill, including its status and payment method, and to verify\
+        \ that the bill has been created and stored correctly in the system. The user\
+        \ can also use this endpoint to retrieve the bill details for further processing,\
+        \ such as updating the bill, sharing it with other users, or exporting it\
+        \ for record-keeping purposes. If the quantity of the bill is updated, it\
+        \ will also affect the user's qtyWasted accordingly."
+      operationId: getBillById
+      parameters:
+      - explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                id: 123e4567-e89b-12d3-a456-426614174000
+                userId: 123e4567-e89b-12d3-a456-426614174000
+                quantity: 1.5
+                description: Compra semanal
+                categoryId: 123e4567-e89b-12d3-a456-426614174000
+                status: PENDIENTE
+                paymentMethod: EFECTIVO
+                shared: false
+                createdAt: 2026-10-24T00:00:00Z
+                updatedAt: 2026-10-24T00:00:00Z
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              example:
+                message: Invalid billId format.
+                code: 400
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthorized.
+                code: 401
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+                code: 403
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Get a bill by its ID.
+      tags:
+      - bill
+      x-accepts:
+      - application/json
+    put:
+      description: "Update the details of an existing bill. The billId is provided\
+        \ in the path, and the updated bill data is provided in the request body.\
+        \ The user must be authenticated to access this endpoint. The billId provided\
+        \ in the path must correspond to an existing bill in the system. If the billId\
+        \ is invalid or does not exist, a 404 Not Found error will be returned. The\
+        \ updated bill data provided in the request body must be valid and complete.\
+        \ If the updated data is invalid or incomplete, a 400 Bad Request error will\
+        \ be returned. The user can update the bill's, quantity, description, categoryId\
+        \ y paymentMethod. The response will include the details of the updated bill,\
+        \ including its unique ID and timestamps for creation and modification. The\
+        \ user can use this endpoint to correct any errors in the bill data, change\
+        \ the status of the bill, or update the payment method or category as needed.\
+        \ The updated bill will be saved in the system and will be reflected in subsequent\
+        \ queries for bills. The response will be in JSON format, and the updated\
+        \ bill details will be structured according to the Bill schema defined in\
+        \ the components section of the API documentation. The billId provided in\
+        \ the path must be for the authenticated user. If the billId belongs to a\
+        \ different user, a 403 Forbidden error will be returned. It is necessary\
+        \ communications with Category service to ensure the categoryId provided in\
+        \ the bill exists and is valid. If the categoryId is invalid or does not exist,\
+        \ a 400 Bad Request error will be returned. To obtain the category details,\
+        \ the system will communicate with the Category service using the GET -> /category/{categoryId}\
+        \ endpoint."
+      operationId: updateBill
+      parameters:
+      - explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BillRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                id: 123e4567-e89b-12d3-a456-426614174000
+                userId: 123e4567-e89b-12d3-a456-426614174000
+                quantity: 1.5
+                description: Compra semanal
+                categoryId: 123e4567-e89b-12d3-a456-426614174000
+                status: PENDIENTE
+                paymentMethod: EFECTIVO
+                shared: false
+                createdAt: 2026-10-24T00:00:00Z
+                updatedAt: 2026-10-24T00:00:00Z
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              example:
+                message: Invalid bill data. Please check the provided information.
+                code: 400
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthorized.
+                code: 401
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+                code: 403
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Internal server error.
+                code: 500
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              example:
+                message: Internal server error.
+                code: 503
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Update a bill
+      tags:
+      - bill
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /bill/{billId}/status:
+    patch:
+      description: "Update the status of an existing bill. The billId is provided\
+        \ in the path, and the new status is provided in the request body. The user\
+        \ must be authenticated to access this endpoint, and the provided bearer token\
+        \ must be valid. If the token is missing or invalid, a 401 Unauthorized error\
+        \ will be returned. The billId provided in the path must correspond to an\
+        \ existing bill in the system. If the billId is invalid or does not exist,\
+        \ a 404 Not Found error will be returned. The new status provided in the request\
+        \ body must be one of the allowed values defined in the StatusBill schema.\
+        \ If an invalid status is provided, a 400 Bad Request error will be returned.\
+        \ The billId provided in the path must be for the authenticated user. If the\
+        \ billId belongs to a different user, a 403 Forbidden error will be returned.\
+        \ The endpoint will return the details of the updated bill, including its\
+        \ unique ID, user ID, quantity, description, category ID, status, payment\
+        \ method, shared status, creation and modification timestamps, and active\
+        \ status. The user can use this endpoint to change the status of a bill, such\
+        \ as marking it as paid or pending, and the updated status will be reflected\
+        \ in subsequent queries for bills. The response will be in JSON format, and\
+        \ the updated bill details will be structured according to the Bill schema\
+        \ defined in the components section of the API documentation. The user can\
+        \ also use this endpoint to update the status of a bill for record-keeping\
+        \ purposes or to reflect changes in the bill's payment status."
+      operationId: changeStatus
+      parameters:
+      - explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeStatusRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid billId. The provided billId is invalid or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Change the status of a bill
+      tags:
+      - Status
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /bill/{billId}/share:
+    post:
+      description: "Share a bill with other user by providing its userId and the corresponding\
+        \ quantitys it should contribute. The billId is provided in the path, and\
+        \ the sharing details are provided in the request body. The user must be authenticated\
+        \ to access this endpoint, and the provided bearer token must be valid. If\
+        \ the token is missing or invalid, a 401 Unauthorized error will be returned.\
+        \ The billId provided in the path must correspond to an existing bill in the\
+        \ system. If the billId is invalid or does not exist, a 404 Not Found error\
+        \ will be returned. The sharing details provided in the request body must\
+        \ be valid and complete. If the sharing details are invalid or incomplete,\
+        \ a 400 Bad Request error will be returned. The billId provided in the path\
+        \ must be for the authenticated user. If the billId belongs to a different\
+        \ user, a 403 Forbidden error will be returned. The user can also use this\
+        \ endpoint to share the bill for record-keeping purposes or to facilitate\
+        \ payment collection from other users. Once the bill is successfully shared,\
+        \ the response will include the updated details of the bill, reflecting the\
+        \ sharing information and the field isShared will be set to true and partaker\
+        \ will contain the userId"
+      operationId: shareBill
+      parameters:
+      - description: ID of the bill to share
+        explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShareBillRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid billId. The provided billId is invalid or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Share a bill with other users
+      tags:
+      - Share
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /bill/{billId}/partaker:
+    get:
+      description: "Retrieve the list of users who are partaker of a specific bill,\
+        \ along with the quantitys they are responsible for. The billId is provided\
+        \ in the path parameter. The response will include the details of each partaker,\
+        \ including their user ID and the quantity they are responsible for contributing\
+        \ to the bill. The user must be authenticated to access this endpoint, and\
+        \ the provided bearer token must be valid. If the token is missing or invalid,\
+        \ a 401 Unauthorized error will be returned. The billId provided in the path\
+        \ must correspond to an existing bill in the system. If the billId is invalid\
+        \ or does not exist, a 404 Not Found error will be returned. The billId provided\
+        \ in the path must be for the authenticated user. If the billId belongs to\
+        \ a different user, a 403 Forbidden error will be returned. The response will\
+        \ be in JSON format, and the partaker details will be structured according\
+        \ to the PartakerBudget schema defined in the components section of the API\
+        \ documentation. The user can use this endpoint to view the list of partaker\
+        \ for a specific bill, including their contributions, and to verify that the\
+        \ bill has been shared correctly with the intended users."
+      operationId: getpartaker
+      parameters:
+      - description: The ID of the bill.
+        explode: false
+        in: path
+        name: billId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/PartakerBudget"
+                type: array
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Get the list of partaker for a specific bill
+      tags:
+      - Share
+      x-accepts:
+      - application/json
+  /bill/{userId}/budget:
+    get:
+      description: "Retrieve the available budget for a specific user. The user ID\
+        \ is provided in the path parameter. The response will include the total budget,\
+        \ the quantity wasted, and the available budget for the user. The user must\
+        \ be authenticated to access this endpoint, and the provided bearer token\
+        \ must be valid. If the token is missing or invalid, a 401 Unauthorized error\
+        \ will be returned. The user ID provided in the path must correspond to an\
+        \ existing user in the system. If the user ID is invalid or does not exist,\
+        \ a 404 Not Found error will be returned. The response will be in JSON format,\
+        \ and the budget details will be structured according to the budget schema\
+        \ defined in the components section of the API documentation. The user can\
+        \ use this endpoint to view their available budget and track their spending\
+        \ against their allocated budget. The result will be the difference between\
+        \ the total budget and the quantity wasted, representing the available budget\
+        \ for the user."
+      operationId: getBudget
+      parameters:
+      - explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Get available budget
+      tags:
+      - Budget
+      x-accepts:
+      - application/json
+  /bill/export:
+    get:
+      description: "Export the list of bills based on various criteria such as user\
+        \ ID, category ID, status, payment method, date range, quantity range, text\
+        \ search, and active status. The exported data will be in a format suitable\
+        \ for further analysis or record-keeping. The user must be authenticated to\
+        \ access this endpoint, and the provided bearer token must be valid. If the\
+        \ token is missing or invalid, a 401 Unauthorized error will be returned.\
+        \ The response will include the exported bill data in a structured format,\
+        \ which can be downloaded or processed as needed. The user can combine multiple\
+        \ filters to narrow down the results. If no bills match the provided filters,\
+        \ an empty export will be returned. The date filters (initialDate and finalDate)\
+        \ should be provided in the format DD-MM-YYYY HH:MM:SS. If only one date is\
+        \ provided, the filter will apply from that date to the current date or from\
+        \ the earliest bill date to that date, respectively. The user can also filter\
+        \ bills by category ID, which will return the corresponding code for the category\
+        \ in the response. If no category ID is provided, this filter will be ignored.\
+        \ The category ID and user ID filters should correspond to existing categories\
+        \ and users in the system. If invalid IDs are provided, a 400 Bad Request\
+        \ error will be returned. The status and payment method filters should be\
+        \ one of the allowed values defined in the StatusBill and paymentMethod schemas,\
+        \ respectively. If invalid values are provided, a 400 Bad Request error will\
+        \ be returned. The response will be paginated if the number of bills exceeds\
+        \ a certain threshold, and the user can navigate through the pages using query\
+        \ parameters for page number and page size. The list of bills must be for\
+        \ the authenticated user. If the user ID provided in the query does not match\
+        \ the authenticated user's ID, a 403 Forbidden error will be returned."
+      operationId: exportBillList
+      parameters:
+      - explode: true
+        in: query
+        name: userId
+        required: true
+        schema:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: initialDate
+        required: false
+        schema:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: finalDate
+        required: false
+        schema:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        style: form
+      - example: PENDIENTE
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          $ref: "#/components/schemas/StatusBill"
+        style: form
+      - example: EFECTIVO
+        explode: true
+        in: query
+        name: paymentMethod
+        required: false
+        schema:
+          $ref: "#/components/schemas/paymentMethod"
+        style: form
+      - description: ID of the category to filter bills by. The user will receive
+          the code corresponding to the category in the response.
+        example: 123e4567-e89b-12d3-a456-426614174000
+        explode: true
+        in: query
+        name: categoryId
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                properties:
+                  id:
+                    description: The unique identifier for the bill.
+                    type: string
+                  quantity:
+                    description: The quantity of the bill.
+                    format: float
+                    type: number
+                  description:
+                    description: A brief description of the bill.
+                    type: string
+                  categoryId:
+                    description: The category to which the bill belongs.
+                    type: string
+                  status:
+                    description: The status of the bill.
+                    type: string
+                  paymentMethod:
+                    description: The method of payment for the bill.
+                    type: string
+                  shared:
+                    description: Indicates whether the bill is shared.
+                    type: boolean
+                type: string
+          description: Successful operation.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid search query. The provided search query is invalid
+            or malformed.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Unauthorized. The user is not authenticated.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Forbidden. The user does not have permission to access this
+            resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error. An unexpected error occurred on the
+            server.
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Service unavailable. The server is currently unable to handle
+            the request due to temporary overload or maintenance.
+      summary: Export bill list
+      tags:
+      - Export
+      x-accepts:
+      - application/json
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - text/csv
+components:
+  parameters:
+    billId:
+      description: The ID of the bill.
+      explode: false
+      in: path
+      name: billId
+      required: true
+      schema:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        format: uuid
+        type: string
+      style: simple
+  schemas:
+    Bill:
+      example:
+        billId: 123e4567-e89b-12d3-a456-426614174000
+        userId: 123e4567-e89b-12d3-a456-426614174000
+        quantity: 1.5
+        description: Compra semanal
+        categoryId: 123e4567-e89b-12d3-a456-426614174000
+        status: PENDIENTE
+        paymentMethod: EFECTIVO
+        shared: false
+        creationDate: 2026-10-24T00:00:00Z
+        modificationDate: 2026-10-24T00:00:00Z
+        deleteDate: 2000-01-23T04:56:07.000+00:00
+        partaker:
+          key:
+            userId: 123e4567-e89b-12d3-a456-426614174000
+            quantity: 0.75
+        isActive: true
+      properties:
+        billId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        userId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        quantity:
+          example: 1.5
+          format: double
+          type: number
+        description:
+          example: Compra semanal
+          type: string
+        categoryId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        status:
+          allOf:
+          - $ref: "#/components/schemas/StatusBill"
+          example: PENDIENTE
+        paymentMethod:
+          allOf:
+          - $ref: "#/components/schemas/paymentMethod"
+          example: EFECTIVO
+        shared:
+          example: false
+          type: boolean
+        creationDate:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        modificationDate:
+          example: 2026-10-24T00:00:00Z
+          format: date-time
+          type: string
+        deleteDate:
+          format: date-time
+          nullable: true
+          type: string
+          example: null
+        partaker:
+          additionalProperties:
+            $ref: "#/components/schemas/Bill_partaker_value"
+          type: object
+        isActive:
+          example: true
+          type: boolean
+      required:
+      - billId
+      - categoryId
+      - description
+      - isActive
+      - paymentMethod
+      - quantity
+      - shared
+      - status
+      - userId
+      type: object
+    BillRequest:
+      example:
+        userId: 123e4567-e89b-12d3-a456-426614174000
+        quantity: 1.5
+        description: Compra semanal
+        categoryId: 123e4567-e89b-12d3-a456-426614174000
+        paymentMethod: EFECTIVO
+      properties:
+        userId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        quantity:
+          example: 1.5
+          format: double
+          minimum: 0.01
+          type: number
+        description:
+          example: Compra semanal
+          type: string
+        categoryId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        paymentMethod:
+          allOf:
+          - $ref: "#/components/schemas/paymentMethod"
+          example: EFECTIVO
+      required:
+      - categoryId
+      - description
+      - paymentMethod
+      - quantity
+      - userId
+      type: object
+    StatusBill:
+      enum:
+      - PENDIENTE
+      - PAGADO
+      - CANCELADO
+      - RECLAMADO
+      - DEVUELTO
+      example: PENDIENTE
+      type: string
+    paymentMethod:
+      enum:
+      - EFECTIVO
+      - TARJETA
+      - BIZUM
+      - TRANSFERENCIA
+      - OTRO
+      example: EFECTIVO
+      type: string
+    ChangeStatusRequest:
+      example:
+        status: PAGADO
+      properties:
+        status:
+          allOf:
+          - $ref: "#/components/schemas/StatusBill"
+          example: PAGADO
+      required:
+      - status
+      type: object
+    ShareBillRequest:
+      description: Request payload for sharing a bill with other users. The communication
+        will include the userId and the quantity each partaker is responsible for
+        paying.
+      example:
+        partaker:
+        - email: example@example.com
+          quantity: 0.75
+      properties:
+        partaker:
+          $ref: "#/components/schemas/ShareBillRequest_partaker"
+      required:
+      - partaker
+      type: object
+    PartakerBudget:
+      example:
+        userId: 123e4567-e89b-12d3-a456-426614174000
+        quantity: 0.75
+      properties:
+        userId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        quantity:
+          example: 0.75
+          format: double
+          type: number
+      type: object
+    Budget:
+      example:
+        budget: 1000.0
+        wasted: 500.0
+        availableBudget: 500.0
+      properties:
+        budget:
+          example: 1000.0
+          format: double
+          type: number
+        wasted:
+          example: 500.0
+          format: double
+          type: number
+        availableBudget:
+          example: 500.0
+          format: double
+          type: number
+      type: object
+    Error:
+      example:
+        code: 400
+        message: Invalid request parameters.
+      properties:
+        code:
+          example: 400
+          format: int32
+          type: integer
+        message:
+          example: Invalid request parameters.
+          type: string
+      type: object
+    Bill_partaker_value:
+      example:
+        userId: 123e4567-e89b-12d3-a456-426614174000
+        quantity: 0.75
+      properties:
+        userId:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          format: uuid
+          type: string
+        quantity:
+          example: 0.75
+          format: double
+          type: number
+      type: object
+    ShareBillRequest_partaker:
+      properties:
+        email:
+          example: example@example.com
+          format: email
+          type: string
+        quantity:
+          example: 0.75
+          format: double
+          type: number
+      type: object
+
